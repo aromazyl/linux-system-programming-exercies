@@ -14,7 +14,7 @@
 
 void do_more(FILE*);
 
-int see_more();
+int see_more(FILE*);
 
 int
 main(int argc, char* argv[]) {
@@ -33,9 +33,10 @@ void do_more(FILE* file) {
   char line[LINELEN];
   int num_of_lines = 0;
   int reply;
+  FILE* tty_file = fopen("/dev/tty", "r");
   while (fgets(line, LINELEN, file)) {
     if (num_of_lines == PAGELEN) {
-      reply = see_more();
+      reply = see_more(tty_file);
       if (!reply) break;
       num_of_lines -= reply;
     }
@@ -44,10 +45,10 @@ void do_more(FILE* file) {
   }
 }
 
-int see_more() {
+int see_more(FILE* cmd) {
   int c;
   printf("\033[7m more? \033[m");
-  while ((c = getchar()) != EOF) {
+  while ((c = getc(cmd)) != EOF) {
     if (c == 'q') return 0;
     if (c == ' ') return PAGELEN;
     if (c == '\n') return 1;
